@@ -1,13 +1,36 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { MobileLayout } from "@/components/layout/MobileLayout";
+import { GreetingHeader } from "@/components/dashboard/GreetingHeader";
+import { MotivationalBanner } from "@/components/dashboard/MotivationalBanner";
+import { ProgressCard } from "@/components/dashboard/ProgressCard";
+import { QuickActions } from "@/components/dashboard/QuickActions";
+import { TodaySchedule } from "@/components/dashboard/TodaySchedule";
+import { UpcomingEvents } from "@/components/dashboard/UpcomingEvents";
 
 const Index = () => {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
+    <MobileLayout>
+      <GreetingHeader 
+        name="أحمد" 
+        notificationCount={3}
+      />
+      
+      <MotivationalBanner />
+      
+      <div className="mt-4">
+        <ProgressCard 
+          semesterProgress={42}
+          coursesCompleted={3}
+          totalCourses={7}
+          gpa={3.45}
+        />
       </div>
-    </div>
+      
+      <QuickActions />
+      
+      <TodaySchedule />
+      
+      <UpcomingEvents />
+    </MobileLayout>
   );
 };
 
