@@ -1,6 +1,9 @@
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
+import { useProfile } from "@/hooks/useProfile";
 import { 
   Settings, 
   BookOpen, 
@@ -11,10 +14,13 @@ import {
   ChevronLeft,
   TrendingUp,
   Target,
-  Star
+  Star,
+  LogOut,
+  Loader2
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
 
 const stats = [
   { label: "أيام الدراسة", value: "23", icon: Calendar },
@@ -33,6 +39,26 @@ const menuItems = [
 ];
 
 export default function Profile() {
+  const { signOut, user } = useAuth();
+  const { data: profile, isLoading } = useProfile();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const handleSignOut = async () => {
+    await signOut();
+    toast({
+      title: "تم تسجيل الخروج",
+      description: "نراك قريباً!",
+    });
+    navigate("/auth");
+  };
+
+  const displayName = profile?.full_name || "طالب";
+  const faculty = profile?.faculty || "علوم الحاسوب";
+  const university = profile?.university || "جامعة تل أبيب";
+  const academicYear = profile?.academic_year || 2;
+  const gpa = profile?.gpa || 3.45;
+
   return (
     <MobileLayout>
       {/* Profile Header */}
@@ -42,15 +68,21 @@ export default function Profile() {
           <div className="bg-card rounded-2xl shadow-medium p-5 border border-border/50">
             <div className="flex items-start gap-4">
               <Avatar className="w-20 h-20 border-4 border-card -mt-12 shadow-medium">
-                <AvatarImage src="" alt="أحمد" />
+                <AvatarImage src={profile?.avatar_url || ""} alt={displayName} />
                 <AvatarFallback className="bg-primary text-primary-foreground text-2xl font-bold">
-                  أ
+                  {displayName.charAt(0)}
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1 pt-1">
-                <h1 className="text-xl font-bold text-foreground">أحمد محمود</h1>
-                <p className="text-sm text-muted-foreground">علوم الحاسوب - السنة الثانية</p>
-                <p className="text-xs text-primary mt-1">جامعة تل أبيب</p>
+                {isLoading ? (
+                  <Loader2 className="w-5 h-5 animate-spin text-primary" />
+                ) : (
+                  <>
+                    <h1 className="text-xl font-bold text-foreground">{displayName}</h1>
+                    <p className="text-sm text-muted-foreground">{faculty} - السنة {academicYear === 1 ? "الأولى" : academicYear === 2 ? "الثانية" : academicYear === 3 ? "الثالثة" : "الرابعة"}</p>
+                    <p className="text-xs text-primary mt-1">{university}</p>
+                  </>
+                )}
               </div>
             </div>
 
@@ -86,7 +118,7 @@ export default function Profile() {
       </div>
 
       {/* Menu */}
-      <div className="px-4 mt-6 pb-6">
+      <div className="px-4 mt-6">
         <div className="bg-card rounded-xl shadow-soft border border-border/50 overflow-hidden">
           {menuItems.map((item, index) => (
             <Link
@@ -105,6 +137,21 @@ export default function Profile() {
             </Link>
           ))}
         </div>
+      </div>
+
+      {/* Sign Out Button */}
+      <div className="px-4 mt-6 pb-6">
+        <Button 
+          variant="outline" 
+          className="w-full text-destructive border-destructive/30 hover:bg-destructive/10"
+          onClick={handleSignOut}
+        >
+          <LogOut className="w-4 h-4 ml-2" />
+          تسجيل الخروج
+        </Button>
+        <p className="text-center text-xs text-muted-foreground mt-3">
+          {user?.email}
+        </p>
       </div>
     </MobileLayout>
   );
