@@ -5,12 +5,19 @@ import { ProgressCard } from "@/components/dashboard/ProgressCard";
 import { QuickActions } from "@/components/dashboard/QuickActions";
 import { TodaySchedule } from "@/components/dashboard/TodaySchedule";
 import { UpcomingEvents } from "@/components/dashboard/UpcomingEvents";
+import { useProfile } from "@/hooks/useProfile";
 
 const Index = () => {
+  const { data: profile, isLoading } = useProfile();
+
+  const displayName = profile?.full_name || "طالب";
+  const gpa = profile?.gpa ? Number(profile.gpa) : 3.45;
+
   return (
     <MobileLayout>
       <GreetingHeader 
-        name="أحمد" 
+        name={displayName} 
+        avatarUrl={profile?.avatar_url || undefined}
         notificationCount={3}
       />
       
@@ -21,7 +28,7 @@ const Index = () => {
           semesterProgress={42}
           coursesCompleted={3}
           totalCourses={7}
-          gpa={3.45}
+          gpa={gpa}
         />
       </div>
       
