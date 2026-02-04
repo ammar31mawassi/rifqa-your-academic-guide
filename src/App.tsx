@@ -12,6 +12,7 @@ import Add from "./pages/Add";
 import Profile from "./pages/Profile";
 import Groups from "./pages/Groups";
 import Tutors from "./pages/Tutors";
+import GPACalculator from "./pages/GPACalculator";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 
@@ -33,6 +34,7 @@ const App = () => (
             <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             <Route path="/groups" element={<ProtectedRoute><Groups /></ProtectedRoute>} />
             <Route path="/tutors" element={<ProtectedRoute><Tutors /></ProtectedRoute>} />
+            <Route path="/gpa" element={<ProtectedRoute><GPACalculator /></ProtectedRoute>} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
