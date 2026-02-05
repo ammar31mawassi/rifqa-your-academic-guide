@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      courses: {
+        Row: {
+          components: Json
+          created_at: string
+          credits: number
+          id: string
+          name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          components?: Json
+          created_at?: string
+          credits?: number
+          id?: string
+          name?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          components?: Json
+          created_at?: string
+          credits?: number
+          id?: string
+          name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           academic_year: number | null
