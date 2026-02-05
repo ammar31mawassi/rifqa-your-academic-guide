@@ -9,8 +9,49 @@ export interface GradeComponent {
 export interface Course {
   id: string;
   name: string;
-  credits: number;
+  credits: number; // Can be decimal (e.g., 4.5, 0.5)
   components: GradeComponent[];
+}
+
+// Calculate percentage-based GPA (0-100 scale)
+export function calculatePercentageGPA(courses: Course[]): {
+  averageScore: number;
+  completedCredits: number;
+  totalCredits: number;
+  overallProgress: number;
+} {
+  let totalWeightedScore = 0;
+  let completedCredits = 0;
+  let totalCredits = 0;
+  let totalProgress = 0;
+  let validCourseCount = 0;
+
+  courses.forEach((course) => {
+    totalCredits += course.credits;
+    const completedComponents = course.components.filter((c) => c.score !== null);
+    if (completedComponents.length === 0) return;
+
+    const completedWeight = completedComponents.reduce((sum, c) => sum + c.weight, 0);
+    const weightedScore = completedComponents.reduce((sum, c) => {
+      const normalizedScore = (c.score! / c.maxScore) * 100;
+      return sum + (normalizedScore * c.weight) / 100;
+    }, 0);
+
+    // Project final grade based on completed work
+    const courseScore = completedWeight > 0 ? (weightedScore / completedWeight) * 100 : 0;
+
+    totalWeightedScore += courseScore * course.credits;
+    completedCredits += course.credits * (completedWeight / 100);
+    totalProgress += completedWeight;
+    validCourseCount++;
+  });
+
+  return {
+    averageScore: validCourseCount > 0 ? totalWeightedScore / totalCredits : 0,
+    completedCredits,
+    totalCredits,
+    overallProgress: validCourseCount > 0 ? totalProgress / validCourseCount : 0,
+  };
 }
 
 export const defaultComponents: Omit<GradeComponent, 'id'>[] = [
