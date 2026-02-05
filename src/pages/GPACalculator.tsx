@@ -1,12 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, Calculator, RotateCcw, Home } from "lucide-react";
+import { Plus, Calculator, RotateCcw, Home, Save, Loader2 } from "lucide-react";
 import { Course, defaultComponents, calculatePercentageGPA } from "@/components/gpa/types";
 import { CourseCard } from "@/components/gpa/CourseCard";
 import { GPAResult } from "@/components/gpa/GPAResult";
+import { useCourses, useSaveCourses } from "@/hooks/useCourses";
 
 const createNewCourse = (): Course => ({
   id: Date.now().toString(),
@@ -20,6 +21,9 @@ const createNewCourse = (): Course => ({
 
 export default function GPACalculator() {
   const navigate = useNavigate();
+  const { data: savedCourses, isLoading } = useCourses();
+  const { mutate: saveCourses, isPending: isSaving } = useSaveCourses();
+  
   const [courses, setCourses] = useState<Course[]>([createNewCourse()]);
   const [result, setResult] = useState<{
     averageScore: number;
@@ -27,6 +31,18 @@ export default function GPACalculator() {
     totalCredits: number;
     completedCredits: number;
   } | null>(null);
+
+  // Load saved courses when data is available
+  useEffect(() => {
+    if (savedCourses && savedCourses.length > 0) {
+      setCourses(savedCourses);
+      // Auto-calculate on load
+      const result = calculatePercentageGPA(savedCourses);
+      if (result.totalCredits > 0) {
+        setResult(result);
+      }
+    }
+  }, [savedCourses]);
 
   const addCourse = () => {
     setCourses([...courses, createNewCourse()]);
@@ -51,10 +67,24 @@ export default function GPACalculator() {
     setResult(result);
   };
 
+  const handleSave = () => {
+    saveCourses(courses);
+  };
+
   const resetCalculator = () => {
     setCourses([createNewCourse()]);
     setResult(null);
   };
+
+  if (isLoading) {
+    return (
+      <MobileLayout>
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </div>
+      </MobileLayout>
+    );
+  }
 
   return (
     <MobileLayout>
@@ -134,6 +164,23 @@ export default function GPACalculator() {
           <Button className="flex-1" onClick={calculateGPA}>
             <Calculator className="w-4 h-4 ml-2" />
             احسب المعدل
+          </Button>
+        </div>
+        
+        {/* Save Button */}
+        <div className="pb-6">
+          <Button 
+            variant="secondary" 
+            className="w-full" 
+            onClick={handleSave}
+            disabled={isSaving}
+          >
+            {isSaving ? (
+              <Loader2 className="w-4 h-4 ml-2 animate-spin" />
+            ) : (
+              <Save className="w-4 h-4 ml-2" />
+            )}
+            حفظ الدرجات
           </Button>
         </div>
       </div>
