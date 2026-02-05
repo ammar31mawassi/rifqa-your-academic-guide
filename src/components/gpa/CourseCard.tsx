@@ -118,21 +118,16 @@ export function CourseCard({ course, index, onUpdate, onRemove, canRemove }: Cou
             </div>
             <div>
               <Label className="text-xs text-muted-foreground">الساعات المعتمدة</Label>
-              <Select
-                value={course.credits.toString()}
-                onValueChange={(value) => onUpdate({ ...course, credits: parseInt(value) })}
-              >
-                <SelectTrigger className="mt-1">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {[1, 2, 3, 4, 5, 6].map((credit) => (
-                    <SelectItem key={credit} value={credit.toString()}>
-                      {credit} ساعات
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Input
+                type="number"
+                min={0.5}
+                max={12}
+                step={0.5}
+                value={course.credits}
+                onChange={(e) => onUpdate({ ...course, credits: parseFloat(e.target.value) || 0 })}
+                className="mt-1"
+                placeholder="مثال: 3"
+              />
             </div>
           </div>
 

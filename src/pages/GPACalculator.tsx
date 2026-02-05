@@ -1,9 +1,10 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, Calculator, RotateCcw, Save } from "lucide-react";
-import { Course, GradeComponent, defaultComponents, scoreToGPA } from "@/components/gpa/types";
+import { Plus, Calculator, RotateCcw, Home } from "lucide-react";
+import { Course, defaultComponents, calculatePercentageGPA } from "@/components/gpa/types";
 import { CourseCard } from "@/components/gpa/CourseCard";
 import { GPAResult } from "@/components/gpa/GPAResult";
 
@@ -18,12 +19,13 @@ const createNewCourse = (): Course => ({
 });
 
 export default function GPACalculator() {
+  const navigate = useNavigate();
   const [courses, setCourses] = useState<Course[]>([createNewCourse()]);
   const [result, setResult] = useState<{
-    gpa: number;
     averageScore: number;
     overallProgress: number;
     totalCredits: number;
+    completedCredits: number;
   } | null>(null);
 
   const addCourse = () => {
@@ -41,45 +43,12 @@ export default function GPACalculator() {
   };
 
   const calculateGPA = () => {
-    let totalWeightedScore = 0;
-    let totalCredits = 0;
-    let totalProgress = 0;
-    let validCourseCount = 0;
-
-    courses.forEach((course) => {
-      const completedComponents = course.components.filter((c) => c.score !== null);
-      if (completedComponents.length === 0) return;
-
-      const completedWeight = completedComponents.reduce((sum, c) => sum + c.weight, 0);
-      const weightedScore = completedComponents.reduce((sum, c) => {
-        const normalizedScore = (c.score! / c.maxScore) * 100;
-        return sum + (normalizedScore * c.weight) / 100;
-      }, 0);
-
-      // Project final grade based on completed work
-      const courseScore = completedWeight > 0 ? (weightedScore / completedWeight) * 100 : 0;
-      
-      totalWeightedScore += courseScore * course.credits;
-      totalCredits += course.credits;
-      totalProgress += completedWeight;
-      validCourseCount++;
-    });
-
-    if (validCourseCount === 0) {
+    const result = calculatePercentageGPA(courses);
+    if (result.totalCredits === 0) {
       setResult(null);
       return;
     }
-
-    const averageScore = totalWeightedScore / totalCredits;
-    const overallProgress = totalProgress / validCourseCount;
-    const gpa = scoreToGPA(averageScore);
-
-    setResult({
-      gpa,
-      averageScore,
-      overallProgress,
-      totalCredits,
-    });
+    setResult(result);
   };
 
   const resetCalculator = () => {
@@ -91,24 +60,34 @@ export default function GPACalculator() {
     <MobileLayout>
       <div className="p-4 pt-6">
         {/* Header */}
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
-            <Calculator className="w-6 h-6 text-primary" />
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+              <Calculator className="w-6 h-6 text-primary" />
+            </div>
+            <div>
+              <h1 className="text-xl font-bold text-foreground">حاسبة المعدل</h1>
+              <p className="text-sm text-muted-foreground">احسب معدلك بنظام النسبة المئوية</p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-xl font-bold text-foreground">حاسبة المعدل</h1>
-            <p className="text-sm text-muted-foreground">احسب معدلك بنظام النسبة المئوية</p>
-          </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => navigate("/")}
+            className="h-10 w-10"
+          >
+            <Home className="w-5 h-5" />
+          </Button>
         </div>
 
         {/* Result Card */}
         {result && (
           <div className="mb-6">
             <GPAResult
-              gpa={result.gpa}
               averageScore={result.averageScore}
               overallProgress={result.overallProgress}
               totalCredits={result.totalCredits}
+              completedCredits={result.completedCredits}
             />
           </div>
         )}
