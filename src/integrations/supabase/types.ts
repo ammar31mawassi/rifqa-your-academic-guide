@@ -83,6 +83,83 @@ export type Database = {
         }
         Relationships: []
       }
+      session_participants: {
+        Row: {
+          id: string
+          joined_at: string
+          session_id: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          joined_at?: string
+          session_id: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          joined_at?: string
+          session_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "session_participants_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "study_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      study_sessions: {
+        Row: {
+          category: string
+          course_name: string | null
+          created_at: string
+          creator_id: string
+          description: string | null
+          end_time: string | null
+          id: string
+          location: string | null
+          max_participants: number | null
+          session_date: string
+          start_time: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string
+          course_name?: string | null
+          created_at?: string
+          creator_id: string
+          description?: string | null
+          end_time?: string | null
+          id?: string
+          location?: string | null
+          max_participants?: number | null
+          session_date: string
+          start_time: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          course_name?: string | null
+          created_at?: string
+          creator_id?: string
+          description?: string | null
+          end_time?: string | null
+          id?: string
+          location?: string | null
+          max_participants?: number | null
+          session_date?: string
+          start_time?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
