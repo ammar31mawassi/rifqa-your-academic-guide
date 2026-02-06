@@ -47,7 +47,7 @@ export function CourseCard({ course, index, onUpdate, onRemove, canRemove }: Cou
 
   const addComponent = () => {
     const newComponent: GradeComponent = {
-      id: Date.now().toString(),
+      id: crypto.randomUUID(),
       name: "مكون جديد",
       weight: 0,
       score: null,
@@ -65,9 +65,9 @@ export function CourseCard({ course, index, onUpdate, onRemove, canRemove }: Cou
   const applyPreset = (presetIndex: string) => {
     const preset = componentPresets[parseInt(presetIndex)];
     if (preset) {
-      const newComponents = preset.components.map((c, i) => ({
+      const newComponents = preset.components.map((c) => ({
         ...c,
-        id: `${Date.now()}-${i}`,
+        id: crypto.randomUUID(),
       }));
       onUpdate({ ...course, components: newComponents });
     }
