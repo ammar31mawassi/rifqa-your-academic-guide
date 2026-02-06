@@ -10,12 +10,12 @@ import { GPAResult } from "@/components/gpa/GPAResult";
 import { useCourses, useSaveCourses } from "@/hooks/useCourses";
 
 const createNewCourse = (): Course => ({
-  id: Date.now().toString(),
+  id: crypto.randomUUID(),
   name: "",
   credits: 3,
   components: defaultComponents.map((c, i) => ({
     ...c,
-    id: `${Date.now()}-${i}`,
+    id: `${crypto.randomUUID()}`,
   })),
 });
 
