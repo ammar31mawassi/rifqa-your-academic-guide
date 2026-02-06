@@ -6,12 +6,18 @@ import { QuickActions } from "@/components/dashboard/QuickActions";
 import { TodaySchedule } from "@/components/dashboard/TodaySchedule";
 import { UpcomingEvents } from "@/components/dashboard/UpcomingEvents";
 import { useProfile } from "@/hooks/useProfile";
+import { useCourses } from "@/hooks/useCourses";
+import { calculatePercentageGPA } from "@/components/gpa/types";
 
 const Index = () => {
-  const { data: profile, isLoading } = useProfile();
+  const { data: profile } = useProfile();
+  const { data: courses } = useCourses();
 
   const displayName = profile?.full_name || "طالب";
-  const gpa = profile?.gpa ? Number(profile.gpa) : 3.45;
+
+  const stats = courses && courses.length > 0
+    ? calculatePercentageGPA(courses)
+    : null;
 
   return (
     <MobileLayout>
@@ -25,10 +31,10 @@ const Index = () => {
       
       <div className="mt-4">
         <ProgressCard 
-          semesterProgress={42}
-          coursesCompleted={3}
-          totalCourses={7}
-          gpa={gpa}
+          semesterProgress={stats ? Math.round(stats.overallProgress) : 0}
+          coursesCompleted={stats ? Math.round(stats.completedCredits * 10) / 10 : 0}
+          totalCourses={stats ? stats.totalCredits : 0}
+          gpa={stats ? stats.averageScore : undefined}
         />
       </div>
       

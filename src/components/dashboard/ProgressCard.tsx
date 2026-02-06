@@ -33,13 +33,13 @@ export function ProgressCard({
       
       <div className="flex items-center justify-between text-sm">
         <div className="flex items-center gap-2">
-          <span className="text-primary-foreground/70">المقررات:</span>
+          <span className="text-primary-foreground/70">الساعات:</span>
           <span className="font-semibold">{coursesCompleted}/{totalCourses}</span>
         </div>
-        {gpa && (
+        {gpa !== undefined && gpa > 0 && (
           <div className="flex items-center gap-2">
             <span className="text-primary-foreground/70">المعدل:</span>
-            <span className="font-semibold">{gpa.toFixed(2)}</span>
+            <span className="font-semibold">{gpa.toFixed(1)}%</span>
           </div>
         )}
       </div>
