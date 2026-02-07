@@ -14,8 +14,91 @@ export type Database = {
   }
   public: {
     Tables: {
+      course_catalog: {
+        Row: {
+          created_at: string
+          created_by: string
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      course_enrollments: {
+        Row: {
+          catalog_course_id: string
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          catalog_course_id: string
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          catalog_course_id?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "course_enrollments_catalog_course_id_fkey"
+            columns: ["catalog_course_id"]
+            isOneToOne: false
+            referencedRelation: "course_catalog"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      course_messages: {
+        Row: {
+          catalog_course_id: string
+          content: string
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          catalog_course_id: string
+          content: string
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          catalog_course_id?: string
+          content?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "course_messages_catalog_course_id_fkey"
+            columns: ["catalog_course_id"]
+            isOneToOne: false
+            referencedRelation: "course_catalog"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       courses: {
         Row: {
+          catalog_course_id: string | null
           components: Json
           created_at: string
           credits: number
@@ -25,6 +108,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          catalog_course_id?: string | null
           components?: Json
           created_at?: string
           credits?: number
@@ -34,6 +118,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          catalog_course_id?: string | null
           components?: Json
           created_at?: string
           credits?: number
@@ -42,7 +127,15 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "courses_catalog_course_id_fkey"
+            columns: ["catalog_course_id"]
+            isOneToOne: false
+            referencedRelation: "course_catalog"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {

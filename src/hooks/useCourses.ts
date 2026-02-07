@@ -10,6 +10,7 @@ interface DBCourse {
   name: string;
   credits: number;
   components: GradeComponent[];
+  catalog_course_id: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -35,6 +36,7 @@ export function useCourses() {
         name: course.name,
         credits: course.credits,
         components: course.components,
+        catalogCourseId: course.catalog_course_id,
       }));
     },
     enabled: !!user,
@@ -70,24 +72,61 @@ export function useSaveCourses() {
         if (deleteError) throw deleteError;
       }
 
-      // Upsert courses
+      // For each course, ensure it exists in the catalog and user is enrolled
       for (const course of courses) {
-        const courseData = {
-          id: course.id,
-          user_id: user.id,
-          name: course.name,
-          credits: course.credits,
-          components: course.components as unknown as Record<string, unknown>[],
-        };
-        
-        const { error } = await supabase
-          .from("courses")
-          .upsert(courseData as never);
-        if (error) throw error;
+        if (course.name.trim()) {
+          // Try to find or create catalog entry
+          let catalogId: string | null = null;
+
+          const { data: existing } = await supabase
+            .from("course_catalog")
+            .select("id")
+            .eq("name", course.name.trim())
+            .maybeSingle();
+
+          if (existing) {
+            catalogId = existing.id;
+          } else {
+            const { data: created } = await supabase
+              .from("course_catalog")
+              .insert({ name: course.name.trim(), created_by: user.id })
+              .select("id")
+              .single();
+
+            if (created) catalogId = created.id;
+          }
+
+          // Auto-enroll if not already
+          if (catalogId) {
+            await supabase
+              .from("course_enrollments")
+              .upsert(
+                { user_id: user.id, catalog_course_id: catalogId },
+                { onConflict: "user_id,catalog_course_id" }
+              );
+          }
+
+          // Upsert the GPA course
+          const courseData = {
+            id: course.id,
+            user_id: user.id,
+            name: course.name,
+            credits: course.credits,
+            components: course.components as unknown as Record<string, unknown>[],
+            catalog_course_id: catalogId,
+          };
+
+          const { error } = await supabase
+            .from("courses")
+            .upsert(courseData as never);
+          if (error) throw error;
+        }
       }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["courses"] });
+      queryClient.invalidateQueries({ queryKey: ["course_catalog"] });
+      queryClient.invalidateQueries({ queryKey: ["my_enrolled_courses"] });
       toast.success("تم حفظ الدرجات بنجاح");
     },
     onError: (error) => {
