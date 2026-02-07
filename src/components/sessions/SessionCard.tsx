@@ -3,12 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { StudySession } from "@/hooks/useStudySessions";
-
-const categoryLabels: Record<string, string> = {
-  study: "دراسة",
-  social: "اجتماعي",
-  tutoring: "تدريس",
-};
+import { allCategoryLabels } from "./sessionTypes";
 
 interface SessionCardProps {
   session: StudySession;
@@ -54,12 +49,15 @@ export function SessionCard({ session, onJoin, onLeave, isJoining, isLeaving }: 
               variant="secondary"
               className={cn(
                 "text-xs shrink-0",
-                session.category === "study" && "bg-success/10 text-success",
-                session.category === "social" && "bg-secondary/50 text-secondary-foreground",
-                session.category === "tutoring" && "bg-primary/10 text-primary"
+                (session.category === "study" || session.category === "review") && "bg-success/10 text-success",
+                session.category === "tutoring" && "bg-primary/10 text-primary",
+                session.category === "game_night" && "bg-secondary/50 text-secondary-foreground",
+                session.category === "sports" && "bg-success/10 text-success",
+                session.category === "hangout" && "bg-primary/10 text-primary",
+                session.category === "outdoor" && "bg-lecture/10 text-lecture"
               )}
             >
-              {categoryLabels[session.category] || session.category}
+              {allCategoryLabels[session.category] || session.category}
             </Badge>
           </div>
 

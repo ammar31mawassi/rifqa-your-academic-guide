@@ -1,24 +1,24 @@
-import { Users, BookOpen, Award, Calculator } from "lucide-react";
+import { Users, BookOpen, Calculator, PartyPopper } from "lucide-react";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
 const actions = [
   { 
     icon: Users, 
-    label: "مجموعات", 
+    label: "جلسات دراسة", 
     path: "/groups",
     color: "bg-primary/10 text-primary"
+  },
+  { 
+    icon: PartyPopper, 
+    label: "أنشطة", 
+    path: "/activities",
+    color: "bg-secondary/30 text-secondary-foreground"
   },
   { 
     icon: BookOpen, 
     label: "موجّهين", 
     path: "/tutors",
-    color: "bg-secondary/30 text-secondary-foreground"
-  },
-  { 
-    icon: Award, 
-    label: "بطاقات", 
-    path: "/flashcards",
     color: "bg-success/10 text-success"
   },
   { 
