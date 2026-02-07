@@ -11,6 +11,7 @@ export interface Course {
   name: string;
   credits: number; // Can be decimal (e.g., 4.5, 0.5)
   components: GradeComponent[];
+  catalogCourseId?: string | null;
 }
 
 // Calculate percentage-based GPA (0-100 scale)
