@@ -13,16 +13,18 @@ import {
 } from "@/components/ui/dialog";
 import { Plus, Loader2 } from "lucide-react";
 import { useCreateSession } from "@/hooks/useStudySessions";
+import { SessionType, sessionTypeConfig } from "./sessionTypes";
 
-const categoryOptions = [
-  { value: "study", label: "دراسة" },
-  { value: "social", label: "اجتماعي" },
-  { value: "tutoring", label: "تدريس" },
-];
+interface CreateSessionDialogProps {
+  type: SessionType;
+}
 
-export function CreateSessionDialog() {
+export function CreateSessionDialog({ type }: CreateSessionDialogProps) {
+  const config = sessionTypeConfig[type];
   const [open, setOpen] = useState(false);
   const { mutate: createSession, isPending } = useCreateSession();
+
+  const defaultCategory = config.categories[0].value;
 
   const [form, setForm] = useState({
     title: "",
@@ -33,7 +35,7 @@ export function CreateSessionDialog() {
     end_time: "",
     location: "",
     max_participants: 20,
-    category: "study",
+    category: defaultCategory,
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -64,7 +66,7 @@ export function CreateSessionDialog() {
             end_time: "",
             location: "",
             max_participants: 20,
-            category: "study",
+            category: defaultCategory,
           });
         },
       }
@@ -75,6 +77,10 @@ export function CreateSessionDialog() {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
+  const dialogTitle = type === "study" ? "إنشاء جلسة دراسة جديدة" : "إنشاء نشاط ترفيهي جديد";
+  const titlePlaceholder = type === "study" ? "مثال: مراجعة الرياضيات" : "مثال: ليلة ألعاب الجمعة";
+  const descPlaceholder = type === "study" ? "صف ما ستتناوله الجلسة..." : "صف تفاصيل النشاط...";
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -84,35 +90,37 @@ export function CreateSessionDialog() {
       </DialogTrigger>
       <DialogContent className="max-w-[95vw] sm:max-w-md max-h-[85vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>إنشاء جلسة دراسة جديدة</DialogTitle>
+          <DialogTitle>{dialogTitle}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 mt-2">
           <div className="space-y-2">
-            <Label htmlFor="title">عنوان الجلسة *</Label>
+            <Label htmlFor="title">العنوان *</Label>
             <Input
               id="title"
-              placeholder="مثال: مراجعة الرياضيات"
+              placeholder={titlePlaceholder}
               value={form.title}
               onChange={(e) => updateField("title", e.target.value)}
               required
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="course_name">اسم المادة</Label>
-            <Input
-              id="course_name"
-              placeholder="مثال: رياضيات 101"
-              value={form.course_name}
-              onChange={(e) => updateField("course_name", e.target.value)}
-            />
-          </div>
+          {type === "study" && (
+            <div className="space-y-2">
+              <Label htmlFor="course_name">اسم المادة</Label>
+              <Input
+                id="course_name"
+                placeholder="مثال: رياضيات 101"
+                value={form.course_name}
+                onChange={(e) => updateField("course_name", e.target.value)}
+              />
+            </div>
+          )}
 
           <div className="space-y-2">
-            <Label htmlFor="description">وصف الجلسة</Label>
+            <Label htmlFor="description">الوصف</Label>
             <Textarea
               id="description"
-              placeholder="صف ما ستتناوله الجلسة..."
+              placeholder={descPlaceholder}
               value={form.description}
               onChange={(e) => updateField("description", e.target.value)}
               rows={3}
@@ -137,7 +145,7 @@ export function CreateSessionDialog() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {categoryOptions.map((opt) => (
+                  {config.categories.map((opt) => (
                     <SelectItem key={opt.value} value={opt.value}>
                       {opt.label}
                     </SelectItem>
@@ -174,7 +182,7 @@ export function CreateSessionDialog() {
               <Label htmlFor="location">المكان</Label>
               <Input
                 id="location"
-                placeholder="مثال: المكتبة"
+                placeholder={type === "study" ? "مثال: المكتبة" : "مثال: الحديقة"}
                 value={form.location}
                 onChange={(e) => updateField("location", e.target.value)}
               />
@@ -199,7 +207,7 @@ export function CreateSessionDialog() {
                 جاري الإنشاء...
               </>
             ) : (
-              "إنشاء الجلسة"
+              type === "study" ? "إنشاء الجلسة" : "إنشاء النشاط"
             )}
           </Button>
         </form>
