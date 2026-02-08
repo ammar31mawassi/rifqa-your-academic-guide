@@ -137,6 +137,44 @@ export type Database = {
           },
         ]
       }
+      goals: {
+        Row: {
+          course_id: string | null
+          created_at: string
+          goal_type: string
+          id: string
+          target_score: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          course_id?: string | null
+          created_at?: string
+          goal_type?: string
+          id?: string
+          target_score: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          course_id?: string | null
+          created_at?: string
+          goal_type?: string
+          id?: string
+          target_score?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "goals_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           academic_year: number | null
