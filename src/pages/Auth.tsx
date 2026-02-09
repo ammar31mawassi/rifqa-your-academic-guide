@@ -9,40 +9,57 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { GraduationCap, Mail, Lock, User, Loader2 } from "lucide-react";
 import { z } from "zod";
-
 const loginSchema = z.object({
-  email: z.string().trim().email({ message: "البريد الإلكتروني غير صالح" }),
-  password: z.string().min(6, { message: "كلمة المرور يجب أن تكون 6 أحرف على الأقل" }),
+  email: z.string().trim().email({
+    message: "البريد الإلكتروني غير صالح"
+  }),
+  password: z.string().min(6, {
+    message: "كلمة المرور يجب أن تكون 6 أحرف على الأقل"
+  })
 });
-
 const signupSchema = z.object({
-  fullName: z.string().trim().min(2, { message: "الاسم يجب أن يكون حرفين على الأقل" }).max(100),
-  email: z.string().trim().email({ message: "البريد الإلكتروني غير صالح" }),
-  password: z.string().min(6, { message: "كلمة المرور يجب أن تكون 6 أحرف على الأقل" }),
-  confirmPassword: z.string(),
-}).refine((data) => data.password === data.confirmPassword, {
+  fullName: z.string().trim().min(2, {
+    message: "الاسم يجب أن يكون حرفين على الأقل"
+  }).max(100),
+  email: z.string().trim().email({
+    message: "البريد الإلكتروني غير صالح"
+  }),
+  password: z.string().min(6, {
+    message: "كلمة المرور يجب أن تكون 6 أحرف على الأقل"
+  }),
+  confirmPassword: z.string()
+}).refine(data => data.password === data.confirmPassword, {
   message: "كلمات المرور غير متطابقة",
-  path: ["confirmPassword"],
+  path: ["confirmPassword"]
 });
-
 export default function Auth() {
   const [isLoading, setIsLoading] = useState(false);
-  const [loginData, setLoginData] = useState({ email: "", password: "" });
-  const [signupData, setSignupData] = useState({ fullName: "", email: "", password: "", confirmPassword: "" });
+  const [loginData, setLoginData] = useState({
+    email: "",
+    password: ""
+  });
+  const [signupData, setSignupData] = useState({
+    fullName: "",
+    email: "",
+    password: "",
+    confirmPassword: ""
+  });
   const [errors, setErrors] = useState<Record<string, string>>({});
-  
-  const { signIn, signUp } = useAuth();
+  const {
+    signIn,
+    signUp
+  } = useAuth();
   const navigate = useNavigate();
-  const { toast } = useToast();
-
+  const {
+    toast
+  } = useToast();
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({});
-    
     const result = loginSchema.safeParse(loginData);
     if (!result.success) {
       const fieldErrors: Record<string, string> = {};
-      result.error.errors.forEach((err) => {
+      result.error.errors.forEach(err => {
         if (err.path[0]) {
           fieldErrors[err.path[0] as string] = err.message;
         }
@@ -50,34 +67,32 @@ export default function Auth() {
       setErrors(fieldErrors);
       return;
     }
-
     setIsLoading(true);
-    const { error } = await signIn(loginData.email, loginData.password);
+    const {
+      error
+    } = await signIn(loginData.email, loginData.password);
     setIsLoading(false);
-
     if (error) {
       toast({
         title: "خطأ في تسجيل الدخول",
         description: "البريد الإلكتروني أو كلمة المرور غير صحيحة",
-        variant: "destructive",
+        variant: "destructive"
       });
     } else {
       toast({
         title: "مرحباً بك!",
-        description: "تم تسجيل الدخول بنجاح",
+        description: "تم تسجيل الدخول بنجاح"
       });
       navigate("/");
     }
   };
-
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({});
-    
     const result = signupSchema.safeParse(signupData);
     if (!result.success) {
       const fieldErrors: Record<string, string> = {};
-      result.error.errors.forEach((err) => {
+      result.error.errors.forEach(err => {
         if (err.path[0]) {
           fieldErrors[err.path[0] as string] = err.message;
         }
@@ -85,34 +100,33 @@ export default function Auth() {
       setErrors(fieldErrors);
       return;
     }
-
     setIsLoading(true);
-    const { error } = await signUp(signupData.email, signupData.password, signupData.fullName);
+    const {
+      error
+    } = await signUp(signupData.email, signupData.password, signupData.fullName);
     setIsLoading(false);
-
     if (error) {
       toast({
         title: "خطأ في إنشاء الحساب",
         description: error.message,
-        variant: "destructive",
+        variant: "destructive"
       });
     } else {
       toast({
         title: "تم إنشاء الحساب!",
-        description: "يرجى التحقق من بريدك الإلكتروني لتفعيل الحساب",
+        description: "يرجى التحقق من بريدك الإلكتروني لتفعيل الحساب"
       });
     }
   };
-
-  return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
+  return <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
       {/* Logo */}
       <div className="flex items-center gap-3 mb-8">
         <div className="w-14 h-14 bg-primary rounded-2xl flex items-center justify-center">
           <GraduationCap className="w-8 h-8 text-primary-foreground" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-foreground">نجاح</h1>
+          <h1 className="text-2xl font-bold text-foreground">دليلي
+        </h1>
           <p className="text-sm text-muted-foreground">رفيقك الأكاديمي</p>
         </div>
       </div>
@@ -136,14 +150,10 @@ export default function Auth() {
                   <Label htmlFor="login-email">البريد الإلكتروني</Label>
                   <div className="relative">
                     <Mail className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                    <Input
-                      id="login-email"
-                      type="email"
-                      placeholder="example@university.edu"
-                      className="pr-10"
-                      value={loginData.email}
-                      onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
-                    />
+                    <Input id="login-email" type="email" placeholder="example@university.edu" className="pr-10" value={loginData.email} onChange={e => setLoginData({
+                    ...loginData,
+                    email: e.target.value
+                  })} />
                   </div>
                   {errors.email && <p className="text-sm text-destructive">{errors.email}</p>}
                 </div>
@@ -152,27 +162,19 @@ export default function Auth() {
                   <Label htmlFor="login-password">كلمة المرور</Label>
                   <div className="relative">
                     <Lock className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                    <Input
-                      id="login-password"
-                      type="password"
-                      placeholder="••••••••"
-                      className="pr-10"
-                      value={loginData.password}
-                      onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
-                    />
+                    <Input id="login-password" type="password" placeholder="••••••••" className="pr-10" value={loginData.password} onChange={e => setLoginData({
+                    ...loginData,
+                    password: e.target.value
+                  })} />
                   </div>
                   {errors.password && <p className="text-sm text-destructive">{errors.password}</p>}
                 </div>
 
                 <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? (
-                    <>
+                  {isLoading ? <>
                       <Loader2 className="w-4 h-4 animate-spin ml-2" />
                       جاري تسجيل الدخول...
-                    </>
-                  ) : (
-                    "تسجيل الدخول"
-                  )}
+                    </> : "تسجيل الدخول"}
                 </Button>
               </form>
             </TabsContent>
@@ -184,14 +186,10 @@ export default function Auth() {
                   <Label htmlFor="signup-name">الاسم الكامل</Label>
                   <div className="relative">
                     <User className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                    <Input
-                      id="signup-name"
-                      type="text"
-                      placeholder="أحمد محمد"
-                      className="pr-10"
-                      value={signupData.fullName}
-                      onChange={(e) => setSignupData({ ...signupData, fullName: e.target.value })}
-                    />
+                    <Input id="signup-name" type="text" placeholder="أحمد محمد" className="pr-10" value={signupData.fullName} onChange={e => setSignupData({
+                    ...signupData,
+                    fullName: e.target.value
+                  })} />
                   </div>
                   {errors.fullName && <p className="text-sm text-destructive">{errors.fullName}</p>}
                 </div>
@@ -200,14 +198,10 @@ export default function Auth() {
                   <Label htmlFor="signup-email">البريد الإلكتروني</Label>
                   <div className="relative">
                     <Mail className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                    <Input
-                      id="signup-email"
-                      type="email"
-                      placeholder="example@university.edu"
-                      className="pr-10"
-                      value={signupData.email}
-                      onChange={(e) => setSignupData({ ...signupData, email: e.target.value })}
-                    />
+                    <Input id="signup-email" type="email" placeholder="example@university.edu" className="pr-10" value={signupData.email} onChange={e => setSignupData({
+                    ...signupData,
+                    email: e.target.value
+                  })} />
                   </div>
                   {errors.email && <p className="text-sm text-destructive">{errors.email}</p>}
                 </div>
@@ -216,14 +210,10 @@ export default function Auth() {
                   <Label htmlFor="signup-password">كلمة المرور</Label>
                   <div className="relative">
                     <Lock className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                    <Input
-                      id="signup-password"
-                      type="password"
-                      placeholder="••••••••"
-                      className="pr-10"
-                      value={signupData.password}
-                      onChange={(e) => setSignupData({ ...signupData, password: e.target.value })}
-                    />
+                    <Input id="signup-password" type="password" placeholder="••••••••" className="pr-10" value={signupData.password} onChange={e => setSignupData({
+                    ...signupData,
+                    password: e.target.value
+                  })} />
                   </div>
                   {errors.password && <p className="text-sm text-destructive">{errors.password}</p>}
                 </div>
@@ -232,27 +222,19 @@ export default function Auth() {
                   <Label htmlFor="signup-confirm">تأكيد كلمة المرور</Label>
                   <div className="relative">
                     <Lock className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                    <Input
-                      id="signup-confirm"
-                      type="password"
-                      placeholder="••••••••"
-                      className="pr-10"
-                      value={signupData.confirmPassword}
-                      onChange={(e) => setSignupData({ ...signupData, confirmPassword: e.target.value })}
-                    />
+                    <Input id="signup-confirm" type="password" placeholder="••••••••" className="pr-10" value={signupData.confirmPassword} onChange={e => setSignupData({
+                    ...signupData,
+                    confirmPassword: e.target.value
+                  })} />
                   </div>
                   {errors.confirmPassword && <p className="text-sm text-destructive">{errors.confirmPassword}</p>}
                 </div>
 
                 <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? (
-                    <>
+                  {isLoading ? <>
                       <Loader2 className="w-4 h-4 animate-spin ml-2" />
                       جاري إنشاء الحساب...
-                    </>
-                  ) : (
-                    "إنشاء حساب"
-                  )}
+                    </> : "إنشاء حساب"}
                 </Button>
               </form>
             </TabsContent>
@@ -263,6 +245,5 @@ export default function Auth() {
       <p className="mt-6 text-sm text-muted-foreground text-center">
         بتسجيلك، أنت توافق على شروط الاستخدام وسياسة الخصوصية
       </p>
-    </div>
-  );
+    </div>;
 }
